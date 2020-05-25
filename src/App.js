@@ -1,51 +1,48 @@
-import React, { useState } from "react";
-import Name from './components/Name'
-import SockJsClient from 'react-stomp';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
+import React, { useState, useEffect } from 'react';
+import MessageDialog from './components/MessageDialog'
+import MessageInput from './components/MessageInput'
 
 const App = () => {
 
-  const[name, setNameState] = useState("")
+    const [messages, addMessage] = useState([])
 
-  setName = (name) => {
-    console.log(name);
-    setNameState({name: name})
-};
+    const makeid = () => {
+        let result           = '';
+        let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let charactersLength = characters.length;
+        for ( var i = 0; i < 6; i++ ) {
+           result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+     }
+     
 
-  return(
-    <>
-      <Name setName={setName}/>
-      <div className="align-center">
-        <h1>Welcome to Web Sockets</h1>
-        <br/><br/>
-      </div>
-      <div className="align-center">
-        User : <p className="title1"> {this.state.name}</p>
-      </div>
-      <div className="align-center">
-        <br/><br/>
-        <table>
-          <tr>
-            <td>
-              <TextField id="outlined-basic" label="Enter Message to Send" variant="outlined"
-                         onChange={(event) => {
-                             this.setState({typedMessage: event.target.value});
-                         }}/>
-            </td>
-            <td>
-              <Button variant="contained" color="primary"
-                      onClick={this.sendMessage}>Send</Button>
-            </td>
-          </tr>
-        </table>
-      </div>
-                <br/><br/>
-                <div className="align-center">
-                    {this.displayMessages()}
-                </div>
-    </>
-  )
+    const connection = new WebSocket('ws://localhost:8080/ws/websocket')
+
+    useEffect(
+        connection.onmessage = (message) => {
+           // const data = JSON.parse(message.data)
+            addMessage({ ...messages, messages: messages.concat(message)})
+        }
+    )
+
+    const getMessage = (message) => {
+        const data = {name: makeid, message: message}
+        connection.send(JSON.stringify(data))
+        //console.log(data)
+    }
+
+    return(
+
+        <div>
+            <MessageDialog msgs={messages} />
+
+            <MessageInput getMessage={getMessage} />
+
+            <button>send</button>
+
+        </div>
+    )
 }
 
-export default App
+export default App;
