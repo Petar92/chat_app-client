@@ -4,9 +4,9 @@ import MessageInput from './components/MessageInput'
 
 const App = () => {
 
-    const [messages, addMessage] = useState([])
+    const [messages, addMessage] = useState({msgState: [{name:"testState", message: "testMessage"}]})
 
-    const makeid = () => {
+    const createRandomUsername = () => {
         let result           = '';
         let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let charactersLength = characters.length;
@@ -19,28 +19,28 @@ const App = () => {
 
     const connection = new WebSocket('ws://localhost:8080/ws/websocket')
 
-    useEffect(
+    connection.onopen = () => console.log("connected")
+
+//    useEffect(
         connection.onmessage = (message) => {
-           // const data = JSON.parse(message.data)
-            addMessage({ ...messages, messages: messages.concat(message)})
+            console.log(message)
+            //const data = JSON.parse(message)
+            addMessage({ ...messages, msgState: messages.msgState.concat(message)})
         }
-    )
+//    )
 
     const getMessage = (message) => {
-        const data = {name: makeid, message: message}
+        const data = {name: createRandomUsername(), message: message}
         connection.send(JSON.stringify(data))
-        //console.log(data)
+        console.log(data)
     }
 
     return(
 
         <div>
-            <MessageDialog msgs={messages} />
+            <MessageDialog msgs={messages.msgState} />
 
             <MessageInput getMessage={getMessage} />
-
-            <button>send</button>
-
         </div>
     )
 }

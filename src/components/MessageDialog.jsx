@@ -3,9 +3,8 @@ import React from 'react'
 const MessageDialog = (props) => {
 
     return(
-        <div>
-            {console.log(props.msgs)}
-            {props.msgs.map(message => <div>{message.name}: {message.message}</div>)}
+        <div key="10">
+            {props.msgs.map(message => <div key={Math.floor((Math.random()*100000))}>{message.name}: {message.message}</div>)}
         </div>
     )
 }
